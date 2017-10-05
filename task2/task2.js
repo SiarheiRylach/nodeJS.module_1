@@ -1,60 +1,81 @@
 /**
  * Created by Siarhei_Rylach on 10/4/2017.
  */
-function validateJson() {
-    let obj = readJsonFromFile('C:/Users/Siarhei_Rylach/Downloads/Module 1/Module 1/Task 2/4');
-    let errors = [];
-    for(key in obj){
-        if(!(typeof obj['flag'] === 'boolean')){
+"use strict";
 
-        }
+function validateJson(obj) {
+    let errors = "";
+    for(let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            switch (key) {
+                case 'flag':
+                    if (!(typeof obj[key] === 'boolean')) addError(key, obj[key]);
+                    break;
 
-        if( !(typeof Array.isArray(obj['myPromises'])) ){
+                case 'myPromises':
+                    if (!(typeof Array.isArray(obj[key]))) addError(key, obj[key]);
+                    break;
 
-        }
+                case 'element':
+                    if (!(typeof obj[key] === "object")) addError(key, obj[key]);
+                    break;
 
-        if( !(typeof obj['element'] === "object") ){
+                case 'screenshot':
+                    if (!(obj[key] === null)) addError(key, obj[key]);
+                    break;
 
-        }
+                case 'elementText':
+                    if (!(typeof obj[key] === "string")) addError(key, obj[key]);
+                    break;
 
-        if( !(typeof obj['element'] === "object") ){
+                case 'allElementsText':
+                    if ((obj[key].indexOf("const")) < 0) addError(key, obj[key]);
+                    break;
 
-        }
+                case 'counter':
+                    if ((obj[key]) < 10) addError(key, obj[key]);
+                    break;
 
-        if( !(typeof obj['elementText'] === "string") ){
+                case 'config':
+                    if (!(obj[key] === "Common")) addError(key, obj[key]);
+                    break;
 
-        }
+                case 'const':
+                    if (!(obj[key].toLowerCase() === "first")) addError(key, obj[key]);
+                    break;
 
-        if( (obj['allElementsText'].indexOf("const")) < 0 ){
+                case 'parameters':
+                    if ((obj[key].length) !== 8) addError(key, obj[key]);
+                    break;
 
-        }
+                case 'description':
+                    if (((obj[key].length) < 5) || ((obj[key].length) > 13)) addError(key, obj[key]);
+                    break;
 
-        if( (obj['counter']) < 10){
-
-        }
-
-        if( !(obj['config']) === "Common" ){
-
-        }
-
-        if( !(obj['const']) === "FiRst" ){
-
-        }
-
-        if( (obj['parameters'].length) !== 8 ){
-
-        }
-
-        if( ((obj['description'].length) < 5) || ((obj['description'].length) > 13)){
-
+                default:
+                    addError(key, undefined);
+                    break;
+            }
         }
     }
+
+    return errors;
+
 
     function addError(key, value) {
-        errors.push({prop: key, value: value});
+        errors += `Property "${key}" equals "${value}"\n`;
     }
+}
+
+function printErrors(errors) {
+    let fs = require('fs');
+    fs.writeFile('log.txt', errors, (err) => {
+        if(err) console.log(err);
+    });
 }
 
 function readJsonFromFile(path) {
     return require(path);
 }
+
+printErrors(validateJson(readJsonFromFile('C:/Users/Siarhei_Rylach/Downloads/Module 1/Module 1/Task 2/4')));

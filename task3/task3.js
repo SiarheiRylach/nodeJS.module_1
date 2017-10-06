@@ -43,22 +43,23 @@ Promise.resolve(jsonFromDir(getInputDirectory()))
 
 function writeObjIntoXlsx(obj, currentSheet, curRow, curCol) {
     let cRowCell = curRow;
+
     currentSheet.active(true);
-    for(key in obj) {
+    for(let key in obj) {
         if(obj.hasOwnProperty(key)){
-            let fieldJson = obj[key];
             let cColCell = curCol;
-            currentSheet.cell(cColCell + cRowCell).value(key);
+            let fieldJson = obj[key];
+            if(!Array.isArray(obj)) {
+                currentSheet.cell(cColCell + cRowCell).value(key);
+            }else{
+                currentSheet.cell(cColCell + cRowCell).value("elem");
+            }
 
             if (isObject(fieldJson)) {
                 cColCell = nextLetter(cColCell);
                 if (Array.isArray(fieldJson)) {
-                    currentSheet.cell(cColCell + ++cRowCell).value("arr");
-                    cColCell = nextLetter(cColCell);
-
                     fieldJson.forEach((elem) => {
-                        if (isObject(elem) || Array.isArray(elem)) {
-                            currentSheet.cell(cColCell + ++cRowCell).value(key);
+                        if (isObject(elem)) {
                             cRowCell += writeObjIntoXlsx(elem, currentSheet, ++cRowCell, nextLetter(cColCell)) + 1;
                         } else {
                             currentSheet.cell(cColCell + ++cRowCell).value(elem);
@@ -66,11 +67,9 @@ function writeObjIntoXlsx(obj, currentSheet, curRow, curCol) {
 
                     });
                 } else {
-                    currentSheet.cell(cColCell + ++cRowCell).value("obj");
-                    cColCell = nextLetter(cColCell);
                     for (let keyIn in fieldJson) {
                         if (fieldJson.hasOwnProperty(keyIn)) {
-                            if (isObject(fieldJson[keyIn]) || Array.isArray(fieldJson[keyIn])) {
+                            if (isObject(fieldJson[keyIn])) {
                                 currentSheet.cell(cColCell + ++cRowCell).value(keyIn);
                                 cRowCell += writeObjIntoXlsx(fieldJson[keyIn], currentSheet, ++cRowCell, nextLetter(cColCell)) + 1;
                             } else {
@@ -89,6 +88,7 @@ function writeObjIntoXlsx(obj, currentSheet, curRow, curCol) {
             cRowCell++;
         }
     }
+
     return cRowCell - curRow;
 }
 

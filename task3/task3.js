@@ -8,22 +8,6 @@ const path = require('path');
 const currentDir = './';
 
 
-function jsonFromDir(pathDir){
-    let objects = [];
-
-    return new Promise((resolve)=>{
-        fs.readdir(pathDir, (err, files) => {
-            resolve(files);
-        });
-    }).then((files)=>{
-        files.forEach((file)=>{
-            if(path.extname(file) === ".json"){
-                objects.push(require(`${pathDir}/${file}`));
-            }
-        });
-    }).then(()=>{return objects});
-}
-
 Promise.resolve(jsonFromDir(getInputDirectory()))
     .then(data=>{
         let counterSheets = 1;
@@ -114,10 +98,26 @@ function getOutputFile(){
     let args = process.argv;
     for(let i = 2; i < args.length; ++i){
         if(args[i] === "--outputDir"){
-            return args[i + 1];
+            return args[i + 1] + '/out.xlsx';
         }
     }
     return currentDir + 'out.xlsx';
 }
 
+
+function jsonFromDir(pathDir){
+    let objects = [];
+
+    return new Promise((resolve)=>{
+        fs.readdir(pathDir, (err, files) => {
+            resolve(files);
+        });
+    }).then((files)=>{
+        files.forEach((file)=>{
+            if(path.extname(file) === ".json"){
+                objects.push(require(`${pathDir}/${file}`));
+            }
+        });
+    }).then(()=>{return objects});
+}
 

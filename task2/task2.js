@@ -3,6 +3,9 @@
  */
 "use strict";
 
+сonst fs = require('fs');
+const currentDir = './';
+
 function validateJson(obj) {
     let errors = "";
     for(let key in obj) {
@@ -51,10 +54,6 @@ function validateJson(obj) {
                 case 'description':
                     if (((obj[key].length) < 5) || ((obj[key].length) > 13)) addError(key, obj[key]);
                     break;
-
-                default:
-                    addError(key, undefined);
-                    break;
             }
         }
     }
@@ -68,7 +67,8 @@ function validateJson(obj) {
 }
 
 function printErrors(errors) {
-    let fs = require('fs');
+    if (errors === "") errors = "OK";
+
     fs.writeFile('log.txt', errors, (err) => {
         if(err) console.log(err);
     });
@@ -78,4 +78,14 @@ function readJsonFromFile(path) {
     return require(path);
 }
 
-printErrors(validateJson(readJsonFromFile('C:/Users/Siarhei_Rylach/Downloads/Module 1/Module 1/Task 2/4')));
+ function getPathInputJson(){
+        let args = process.argv;
+        for(let i = 2; i < args.length; ++i){
+            if(args[i] === "--inputDir"){
+                return args[i + 1];
+            }
+        }
+        return currentDir + '4';
+ }
+
+printErrors(validateJson(readJsonFromFile(getPathInputJson())));
